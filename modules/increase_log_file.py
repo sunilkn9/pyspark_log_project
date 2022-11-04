@@ -1,6 +1,6 @@
 class augment:
 
-    input_filename = "/content/drive/MyDrive/299999 (1).text"
+    input_filename = "file.text"
 
     count = 0
 
