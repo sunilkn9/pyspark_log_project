@@ -4,8 +4,7 @@ from pyspark.sql.functions import col, when
 import logging
 
 class Started:
-    spark = SparkSession.builder.appName(" ").config('spark.ui.port', '4050').config(
-        "spark.master", "local").enableHiveSupport().getOrCreate()
+    spark = SparkSession.builder.appName(" ").config('spark.jars.packages', 'net.snowflake:snowflake-jdbc:3.13.23,net.snowflake:spark-snowflake_2.12:2.11.0-spark_3.3').enableHiveSupport().getOrCreate()
     curated = spark.read.csv("C:\\Users\\Sunil Kumar\\Downloads\\cleansed_log_details.csv",header=True, inferSchema=True)
 
     def __init__(self):
@@ -49,6 +48,32 @@ class Started:
                               .select("row_id", "day_hour","no_of_clients","no_put","no_post","no_head")
 
         log_across_device.show()
+
+
+        sfOptions = {
+                "sfURL": r"https://tm57257.europe-west4.gcp.snowflakecomputing.com/",
+                "sfAccount": "tm57257",
+                "sfUser": "TESTDATA",
+                "sfPassword": "Welcome@1",
+                "sfDatabase": "SUNIL_DB",
+                "sfSchema": "PUBLIC",
+                "sfWarehouse": "COMPUTE_WH",
+                "sfRole": "ACCOUNTADMIN"
+            }
+
+        curated.write.format("snowflake").options(**sfOptions).option("dbtable",
+                                                                               "{}".format(
+                                                                                   r"curated_log_details")).mode(
+                "overwrite").options(header=True).save()
+        log_per_device.write.format("snowflake").options(**sfOptions).option("dbtable",
+                                                                      "{}".format(
+                                                                          r"log_per_details")).mode(
+            "overwrite").options(header=True).save()
+
+        log_across_device.write.format("snowflake").options(**sfOptions).option("dbtable",
+                                                                      "{}".format(
+                                                                          r"log_across_details")).mode(
+            "overwrite").options(header=True).save()
 
 if __name__ == '__main__':
     try:
