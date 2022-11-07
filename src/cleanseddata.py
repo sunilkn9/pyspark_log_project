@@ -45,11 +45,11 @@ class Starting:
 
     def connect_to_snowflake(self):
         self.sfOptions = {
-            "sfURL": r"https://tm57257.europe-west4.gcp.snowflakecomputing.com/",
-            "sfAccount": "tm57257",
-            "sfUser": "TESTDATA",
-            "sfPassword": "Welcome@1",
-            "sfDatabase": "SUNIL_DB",
+            "sfURL": r"",
+            "sfAccount": "",
+            "sfUser": "",
+            "sfPassword": "",
+            "sfDatabase": "",
             "sfSchema": "PUBLIC",
             "sfWarehouse": "COMPUTE_WH",
             "sfRole": "ACCOUNTADMIN"
