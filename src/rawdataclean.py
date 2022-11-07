@@ -45,11 +45,11 @@ class Start:
         self.df.show(truncate = False)
     def connect_to_snowflake(self):
          self.sfOptions = {
-            "sfURL": r"https://tm57257.europe-west4.gcp.snowflakecomputing.com/",
+            "sfURL": r"",
             "sfAccount": "",
             "sfUser": "",
             "sfPassword":"",
-            "sfDatabase":"SUNIL_DB",
+            "sfDatabase":"",
             "sfSchema":"PUBLIC",
             "sfWarehouse":"COMPUTE_WH",
             "sfRole":"ACCOUNTADMIN"
