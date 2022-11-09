@@ -5,7 +5,7 @@ import pyspark.sql.functions as F
 
 class Start:
     spark = SparkSession.builder.master("local[1]").appName("").config('spark.jars.packages', 'net.snowflake:snowflake-jdbc:3.13.23,net.snowflake:spark-snowflake_2.12:2.11.0-spark_3.1').enableHiveSupport().getOrCreate()
-    df = spark.read.option("delimiter", " ").csv("C:\\Users\\Sunil Kumar\\Downloads\\299999 (1).text")
+    df = spark.read.option("delimiter", " ").csv("C:\\Users\\Sunil Kumar\\Downloads\\log_input.txt")
 
     def __init__(self):
         sc = self.spark.sparkContext
@@ -13,7 +13,7 @@ class Start:
 
     def read_from_s3(self):
         try:
-            self.df =self.spark.read.option("delimiter", " ").csv("C:\\Users\\Sunil Kumar\\Downloads\\299999 (1).text")
+            self.df =self.spark.read.option("delimiter", " ").csv("C:\\Users\\Sunil Kumar\\Downloads\\log_input.txt")
             self.df.show()
 
         except Exception as err:
@@ -40,22 +40,32 @@ class Start:
         self.df.show(truncate = False)
     def remove_character(self):
         # Remove any special characters in the request column(% ,- ? =)
-        self.df = self.df.withColumn('datetime', regexp_replace('datetime', '\[|\]|', ''))
+        self.df = self.df.withColumn('datetime', regexp_replace('datetime', '\[|\]|', '')) \
+            .withColumn("request", regexp_replace("request", "[@\+\#\$\%\^\!\-\,\?\=,]+", "")) \
+            .withColumn("referrer", regexp_replace("referrer", "-", "Null"))
 
         self.df.show(truncate = False)
+
+    def write_to_csv(self):
+
+        #self.df.coalesce(1).write.csv(r"C:\Users\Sunil Kumar\PycharmProjects\pyspark_log_project\output_files\raw.csv",header = True)
+        # self.df.write.mode("overwrite").saveAsTable('raw_log_deta2')
+        # self.spark.sql("select count(*) from raw_log_deta").show()
+        self.df.show(truncate=False)
+
     def connect_to_snowflake(self):
          self.sfOptions = {
             "sfURL": r"",
-            "sfAccount": "",
-            "sfUser": "",
-            "sfPassword":"",
-            "sfDatabase":"",
+            "sfAccount": "s50",
+            "sfUser": "sunil",
+            "sfPassword":"3",
+            "sfDatabase":"SUNILDB",
             "sfSchema":"PUBLIC",
             "sfWarehouse":"COMPUTE_WH",
             "sfRole":"ACCOUNTADMIN"
-        }
+         }
 
-         self.df.write.format("snowflake").options(**self.sfOptions).option("dbtable", "{}".format(r"raw_log_details")).mode(
+         self.df.coalesce(1).write.format("snowflake").options(**self.sfOptions).option("dbtable", "{}".format(r"raw_log_details")).mode(
         "overwrite").options(header=True).save()
 
     def write_to_hive(self):
@@ -92,16 +102,17 @@ if __name__ == "__main__":
         logging.error('Error at %s', 'extract_column_regex', exc_info=e)
         sys.exit(1)
 
-    # try:
-    #    start.write_to_csv()
-    #   logging.info("Writing to Raw Layer S3 Successfull!")
-    #except Exception as e:
-    #   logging.error('Error at %s', 'write_to_s3', exc_info=e)
-    #    sys.exit(1)
+    try:
+        start.write_to_csv()
+    except Exception as e:
+        logging.error('Error at %s', 'write_to_s3', exc_info=e)
+        sys.exit(1)
 
     try:
       start.write_to_hive()
     except Exception as e:
       logging.error('Error at %s', 'write to hive', exc_info=e)
+
+
 
 
