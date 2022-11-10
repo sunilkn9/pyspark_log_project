@@ -44,26 +44,12 @@ class Starting:
     def write_to_s3(self):
         self.df.write.csv("   ", mode="append", header=True)
 
-    def connect_to_snowflake(self):
-        self.sfOptions = {
-            "sfURL": r"",
-            "sfAccount": "su57550",
-            "sfUser": "sunil",
-            "sfPassword": "",
-            "sfDatabase": "SUNILDB",
-            "sfSchema": "PUBLIC",
-            "sfWarehouse": "COMPUTE_WH",
-            "sfRole": "ACCOUNTADMIN"
-        }
-
-        self.df.coalesce(1).write.format("snowflake").options(**self.sfOptions).option("dbtable",
-                                                                           "{}".format(r"cleansed_log_details")).mode(
-            "overwrite").options(header=True).save()
+    
     def write_to_hive(self):
         pass
         # **************************
-        #self.df.write.csv("  ", mode="append", header=True)
-        #self.df.write.saveAsTable('cleanse_log_details')
+        self.df.write.csv("  ", mode="append", header=True)
+        self.df.write.saveAsTable('cleanse_log_details')
 
 if __name__ == "__main__":
     # Start
