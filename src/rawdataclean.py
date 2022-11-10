@@ -53,26 +53,11 @@ class Start:
         # self.spark.sql("select count(*) from raw_log_deta").show()
         self.df.show(truncate=False)
 
-    def connect_to_snowflake(self):
-         self.sfOptions = {
-            "sfURL": r"",
-            "sfAccount": "s50",
-            "sfUser": "sunil",
-            "sfPassword":"3",
-            "sfDatabase":"SUNILDB",
-            "sfSchema":"PUBLIC",
-            "sfWarehouse":"COMPUTE_WH",
-            "sfRole":"ACCOUNTADMIN"
-         }
-
-         self.df.coalesce(1).write.format("snowflake").options(**self.sfOptions).option("dbtable", "{}".format(r"raw_log_details")).mode(
-        "overwrite").options(header=True).save()
-
     def write_to_hive(self):
         pass
         # **************************
-        #self.df.write.csv("   ", mode="append", header=True)
-        #self.df.write.saveAsTable('raw_log_details')
+        self.df.write.csv("   ", mode="append", header=True)
+        self.df.write.saveAsTable('raw_log_details')
 
 
 if __name__ == "__main__":
